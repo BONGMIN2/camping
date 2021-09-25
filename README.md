@@ -88,7 +88,7 @@ B. 도서관리
 ![policy_ct](https://user-images.githubusercontent.com/89369983/132147847-f73fe720-d99d-47b9-9288-b0ebb09743fe.PNG)
 
 ### 완성된 1차 모형
-![image](https://user-images.githubusercontent.com/88808412/134763422-7f815bfd-fc79-4e07-b145-34a6b043f3ad.png)
+![complete](https://user-images.githubusercontent.com/88808412/134763506-462e0a92-db25-4626-b96b-19675beb1fb8.png)
 
 ### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
 ![검증1](https://user-images.githubusercontent.com/89369983/132147856-4da33f2f-a09a-44ae-aa02-5d77b32d9fdb.PNG)
