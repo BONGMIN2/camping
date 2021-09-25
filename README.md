@@ -1,5 +1,4 @@
 # Cloud Lv2 개인
-Camping Site Booking System
 ![image](https://user-images.githubusercontent.com/88808412/134763175-59df144a-e12a-41d3-b031-bfd04ad79881.png)
 ## 캠핑 예약 시스템   
 
