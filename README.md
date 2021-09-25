@@ -1,6 +1,6 @@
 # Cloud Lv2 개인
 Camping Site Booking System
-![rentbook](https://user-images.githubusercontent.com/89369983/131526770-d23daef7-0e18-4dff-8c56-419204bfd670.PNG)
+![image](https://user-images.githubusercontent.com/88808412/134762856-6fa59d41-2df9-4dda-9cee-e7d81a9bd8a5.png)
 ## 캠핑 예약 시스템   
 
 # Table of contents
