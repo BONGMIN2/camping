@@ -365,7 +365,8 @@ server:
 
 ```
 ## CQRS 적용
-TBD
+myPage(View)는 Materialized View로 구현하여, 타 마이크로서비스의 데이터 원본에 Join SQL 등 구현 없이도 내 서비스의 화면 구성과 잦은 조회가 가능하게 구현 하였음.
+![myPage](https://user-images.githubusercontent.com/88808412/134931933-58453fe1-10fe-4236-8564-d5edb8d81c42.png)
 
 ## 폴리글랏 퍼시스턴스
 campsite, payment, view 마이크로서비스는 H2 DB로 구성하였고, booking 마이크로서비스는 HSQL DB로 구성하여 이종 DB사용하면서 정상 동작함을 확인 
@@ -373,7 +374,81 @@ campsite, payment, view 마이크로서비스는 H2 DB로 구성하였고, booki
 ![HSQLDB](https://user-images.githubusercontent.com/88808412/134929017-11882529-9dfe-4ef6-a939-921c268a87f5.png)
 
 ## 동기식 호출과 Fallback 처리
-TBD
+예약 진행시 예약수량보다 캠프사이트 잔여개수가 적으면 예약을 받지 말아야 하므로 동기호출이 필요하다고 판단하여
+Rest Repository에 의해 노출되어 있는 REST 서비스를 FeignClient를 이용하여 호출하도록 구현 하였음
+
+Booking 서비스 내 CampsiteService.Java
+```java
+package camping.external;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Date;
+
+@FeignClient(name="campsite", url="${api.url.campsite}")
+public interface CampsiteService {
+    @RequestMapping(method= RequestMethod.GET, path="/chkAndModifySite")
+    public boolean modifySite(@RequestParam("siteId") Long siteId,
+    @RequestParam("siteNum") int siteCount);
+}
+```
+
+booking 서비스 내 Req/Resp
+```java
+@PostPersist
+public void onPostPersist() throws Exception{
+    
+    boolean rslt = BookingApplication.applicationContext.getBean(camping.external.CampsiteService.class)
+    .modifySite(this.getSiteId(),this.getSiteNum().intValue());
+  
+    if(rslt){
+        System.out.println("=========Booking Result : true==========");
+        this.setStatus("Booking completed");
+        Booked booked = new Booked();
+        BeanUtils.copyProperties(this, booked);
+        booked.publishAfterCommit();
+    }else{
+        System.out.println("=========Booking Result : false==========");
+        throw new Exception("사이트 잔여개수 부족");
+    }
+   }
+```
+
+campsite 서비스 내 booking 서비스 FeignClient 요청 대상
+```java
+ @RestController
+ public class CampsiteController {
+    @Autowired
+    CampsiteRepository campsiteRepository;
+    
+    @RequestMapping(value = "/chkAndModifySite",
+                    method = RequestMethod.GET,
+                    produces = "application/json;charset=UTF-8")
+                    
+    public boolean modifySite(HttpServletRequest request, HttpServletResponse response) throws Exception 
+          System.out.println("##### /campsite/modifySeat called #####");
+    
+          boolean status = false;
+          Long siteId = Long.valueOf(request.getParameter("siteId"));
+          int siteNum = Integer.parseInt(request.getParameter("siteNum"));   
+          
+          Campsite campsite = campsiteRepository.findBysiteId(siteId);
+           
+          if(campsite.getBookableSite() >= siteNum) {
+                       status = true;
+                       campsite.setBookableSite(campsite.getBookableSite()-siteNum);
+                       campsiteRepository.save(campsite);
+          }
+          return status;
+    }
+ }
+```
+
 
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
 TBD
