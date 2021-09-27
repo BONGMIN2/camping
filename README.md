@@ -56,10 +56,10 @@ B. 도서관리
 
 
 ## AS-IS 조직 (Horizontally-Aligned)
-![asis](https://user-images.githubusercontent.com/89369983/132091689-4094136c-c6fa-477e-b614-b478eed1fa0f.PNG)
+![asis](https://user-images.githubusercontent.com/88808412/134913924-99926d2a-5596-40b5-99e5-cd497000f656.png)
 
 ## TO-BE 조직 (Vertically-Aligned)
-![tobe](https://user-images.githubusercontent.com/89369983/132091699-2f0f9164-55da-49d5-a35f-dc6eba7eed19.PNG)
+![tobe](https://user-images.githubusercontent.com/88808412/134914079-f20d9d50-7ecf-4dad-b06c-66255f555ac6.png)
 
 ## Event Storming 결과
 * MSAEz 로 모델링한 이벤트스토밍 결과:  https://labs.msaez.io/#/storming/XZacNdh26uV4zk3mhOUlKKWkLGT2/253af82d374cbe40c9c8c82b244e1194
