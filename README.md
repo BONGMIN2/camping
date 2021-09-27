@@ -85,15 +85,8 @@
 ![complete](https://user-images.githubusercontent.com/88808412/134763506-462e0a92-db25-4626-b96b-19675beb1fb8.png)
 
 ### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
-![검증1](https://user-images.githubusercontent.com/89369983/132147856-4da33f2f-a09a-44ae-aa02-5d77b32d9fdb.PNG)
-![검증2](https://user-images.githubusercontent.com/89369983/132147861-c3a424bc-7f38-412b-a55b-3f09b6b725db.PNG)
-
-### 모델 수정
-TBD
-
-### 비기능 요구사항에 대한 검증
-![비기능](https://user-images.githubusercontent.com/89369983/132147864-393eace5-f9fc-4540-9d22-1804e5407d4e.PNG)
-
+![검증1](https://user-images.githubusercontent.com/88808412/134923667-e163aa33-fde1-4e79-bf55-f1713c32d7ae.png)
+![검증2](https://user-images.githubusercontent.com/88808412/134923738-3afc0388-3e44-48b9-ae71-3e123937c348.png)
 
 
 ## 헥사고날 아키텍처 다이어그램 도출
@@ -107,25 +100,19 @@ TBD
 분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라,구현한 각 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 8084, 8088 이다)
 
 ```shell
-cd book
+cd booking
 mvn spring-boot:run
+
+cd campsite
+mvn spring-boot:run 
 
 cd payment
 mvn spring-boot:run 
 
-cd point
-mvn spring-boot:run 
-
-cd rental 
+cd gateway 
 mvn spring-boot:run
 
-cd mypage 
-mvn spring-boot:run
-
-cd alert 
-mvn spring-boot:run
-
-cd gateway
+cd view
 mvn spring-boot:run 
 ```
 ## DDD(Domain-Driven-Design)의 적용
@@ -135,74 +122,9 @@ Entity Pattern 과 Repository Pattern을 적용하기 위해 Spring Data REST �
 Bookrental 서비스의 rental.java
 
 ```java
+![image](https://user-images.githubusercontent.com/88808412/134926774-cebfaa83-370a-4f6b-a9a6-6b9e9443b85a.png)
 
-package book.rental.system;
 
-import javax.persistence.*;
-import org.springframework.beans.BeanUtils;
-import java.util.List;
-import java.util.Date;
-
-@Entity
-@Table(name="Rental_table")
-public class Rental {
-
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long rentalId;
-    private Integer bookId;
-    private String bookName;
-    private Integer price;
-    private Date startDate;
-    private Date returnDate;
-    private Integer customerId;
-    private String customerPhoneNo;
-    private String rentStatus;
-
-    @PostPersist
-    public void onPostPersist(){
-
-        //  서적 대여 시 상태변경 후 Publish 
-        BookRented bookRented = new BookRented();
-        BeanUtils.copyProperties(this, bookRented);
-        bookRented.publishAfterCommit();
-
-    }
-
-    @PostUpdate 
-    public void onPostUpdate(){
-
-        if("RETURN".equals(this.rentStatus)){           // 반납 처리 Publish
-            BookReturned bookReturned = new BookReturned();
-            BeanUtils.copyProperties(this, bookReturned);
-            bookReturned.publishAfterCommit();
-
-        } else if("DELAY".equals(this.rentStatus)){     // 반납지연 Publish
-            ReturnDelayed returnDelayed = new ReturnDelayed();
-            BeanUtils.copyProperties(this, returnDelayed);
-            returnDelayed.publishAfterCommit();
-        }
-    }    
-
-    public Long getRentalId() {
-        return rentalId;
-    }
-
-    public void setRentalId(Long rentalId) {
-        this.rentalId = rentalId;
-    }
-    public Integer getBookId() {
-        return bookId;
-    }
-
-    public void setBookId(Integer bookId) {
-        this.bookId = bookId;
-    }
-    public String getBookName() {
-        return bookName;
-    }
-    .. getter/setter Method 생략
-```
 
  Payment 서비스의 PolicyHandler.java
  rental 완료시 Payment 이력을 처리한다.
