@@ -122,19 +122,81 @@ Entity Pattern 과 Repository Pattern을 적용하기 위해 Spring Data REST �
 Bookrental 서비스의 rental.java
 
 ```java
-![image](https://user-images.githubusercontent.com/88808412/134926774-cebfaa83-370a-4f6b-a9a6-6b9e9443b85a.png)
 
+package camping;
+
+import javax.persistence.*;
+import org.springframework.beans.BeanUtils;
+import java.util.List;
+import java.util.Date;
+
+@Entity
+@Table(name="Campsite_table")
+public class Campsite {
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Long id;
+    private Long siteId;
+    private String siteType;
+    private Long bookableSite;
+
+    @PostPersist
+    public void onPostPersist(){
+        SiteRegistered siteRegistered = new SiteRegistered();
+        BeanUtils.copyProperties(this, siteRegistered);
+        siteRegistered.publishAfterCommit();
+
+    }
+    @PostUpdate
+    public void onPostUpdate(){
+        SiteModified siteModified = new SiteModified();
+        BeanUtils.copyProperties(this, siteModified);
+        siteModified.publishAfterCommit();
+
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public Long getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(Long siteId) {
+        this.siteId = siteId;
+    }
+    public String getSiteType() {
+        return siteType;
+    }
+
+    public void setSiteType(String siteType) {
+        this.siteType = siteType;
+    }
+    public Long getBookableSite() {
+        return bookableSite;
+    }
+
+    public void setBookableSite(Long bookableSite) {
+        this.bookableSite = bookableSite;
+    }
+
+
+
+
+}
 
 
  Payment 서비스의 PolicyHandler.java
- rental 완료시 Payment 이력을 처리한다.
+ booking 완료시 Payment 이력을 처리한다.
 ```java
-package book.rental.system;
+package camping;
 
-import book.rental.system.config.kafka.KafkaProcessor;
-
-import java.util.Optional;
-
+import camping.config.kafka.KafkaProcessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,26 +209,31 @@ public class PolicyHandler{
     @Autowired PaymentRepository paymentRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverBookRented_PayPoint(@Payload BookRented bookRented){
+    public void wheneverBooked_ApprovePayment(@Payload Booked booked){
 
-        if(!bookRented.validate()) return;
+        if(booked.validate()) {
+           System.out.println("\n\n##### listener ApprovePayment : " + booked.toJson() + "\n\n");
+           
+           Payment payment = new Payment(); 
+           payment.setBookingId(booked.getId());
+           payment.setStatus("PaymentApproved");
+           paymentRepository.save(payment);
 
-        System.out.println("\n\n##### listener PayPoint : " + bookRented.toJson() + "\n\n");
+        }
 
-        if("RENT".equals(bookRented.getRentStatus())){
+    }
+    @StreamListener(KafkaProcessor.INPUT)
+    public void wheneverCanceled_CanclePayment(@Payload BookCancelled bookCancelled){
 
-            Payment payment =new Payment();
+        if(bookCancelled.validate()) {
 
-            payment.setBookId(bookRented.getBookid());
-            payment.setCustomerId(bookRented.getCustomerId());
-            payment.setPrice(bookRented.getPrice());
-            payment.setRentalId(bookRented.getRentalId());
-            paymentRepository.save(payment);
-        }else{
-            System.out.println("\n\n##### listener PayPoint Process Failed : Status -->" +bookRented.getRentStatus() + "\n\n");
+           System.out.println("\n\n##### listener CanclePayment : " + bookCancelled.toJson() + "\n\n");
+           Payment payment = paymentRepository.findByBookingId(bookCancelled.getId());
+           payment.setStatus("PaymentCancelled");
+           paymentRepository.save(payment);
+
         }
     }
-
 
     @StreamListener(KafkaProcessor.INPUT)
     public void whatever(@Payload String eventString){}
@@ -176,35 +243,40 @@ public class PolicyHandler{
 
 ```
 
- BookRental 서비스의 RentalRepository.java
+ campsite 서비스의 CampsiteRepository.java
 
 
 ```java
-package book.rental.system;
+package camping;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@RepositoryRestResource(collectionResourceRel="rentals", path="rentals")
-public interface RentalRepository extends PagingAndSortingRepository<Rental, Long>{
+@RepositoryRestResource(collectionResourceRel="campsites", path="campsites")
+public interface CampsiteRepository extends PagingAndSortingRepository<Campsite, Long>{
 
-
+    Campsite findBysiteId(Long SiteId);
 }
+
 ```
 
 ## 적용 후 REST API 의 테스트
 각 서비스들의 Rest API 호출을 통하여 테스트를 수행하였음
 
 ```shell
-책 대여 처리
-http post localhost:8081/rent bookId=1 price=1000 startDate=20210913 returnDate=20211013 customerId=1234 customerPhoneNo=01012345678 rentStatus=RENT
+캠핑사이트 1번 50개 등록
+http POST http://localhost:8088/campsites siteId=1 siteType=square bookableSite=50     
+![캠프사이트등록](https://user-images.githubusercontent.com/88808412/134927991-668cabaf-4c95-44c4-bd93-7d16b6fbc170.png)
 
-책 대여를 위한 예치금 적립
-TBD
+캠핑사이트 1번 1개 예약
+http POST http://localhost:8088/bookings siteId=1 siteNum=1
+![예약](https://user-images.githubusercontent.com/88808412/134928092-2bb9b8f8-5f38-4b35-8842-e95d4c27974c.png)
 
-책 등록 
-TBD
-```
+캠핑사이트 1번 100개 예약 실패(사이트 잔여수량 부족)  
+http POST http://localhost:8088/bookings siteId=1 siteNum=100       
+![초과예약](https://user-images.githubusercontent.com/88808412/134928203-a6d3940c-d72e-4414-8781-77c28c35f3e6.png)
+                             
+
 
 ## Gateway 적용
 GateWay 구성를 통하여 각 서비스들의 진입점을 설정하여 라우팅 설정하였다.
@@ -219,30 +291,22 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: Rental
+        - id: campsite
           uri: http://localhost:8081
           predicates:
-            - Path=/rentals/** 
-        - id: Book
+            - Path=/campsites/**
+        - id: booking
           uri: http://localhost:8082
           predicates:
-            - Path=/books/** 
-        - id: Payment
+            - Path=/bookings/**  
+        - id: payment
           uri: http://localhost:8083
           predicates:
             - Path=/payments/** 
-        - id: Alert
+        - id: view
           uri: http://localhost:8084
           predicates:
-            - Path=/alerts/** 
-        - id: View
-          uri: http://localhost:8085
-          predicates:
-            - Path= /mypages/**
-        - id: Point
-          uri: http://localhost:8086
-          predicates:
-            - Path=/points/** 
+            - Path= /myPages/**
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -262,30 +326,22 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: Rental
-          uri: http://Rental:8080
+        - id: campsite
+          uri: http://campsite:8080
           predicates:
-            - Path=/rentals/** 
-        - id: Book
-          uri: http://Book:8080
+            - Path=/campsites/** 
+        - id: booking
+          uri: http://booking:8080
           predicates:
-            - Path=/books/** 
-        - id: Payment
-          uri: http://Payment:8080
+            - Path=/bookings/** 
+        - id: payment
+          uri: http://payment:8080
           predicates:
             - Path=/payments/** 
-        - id: Alert
-          uri: http://Alert:8080
+        - id: view
+          uri: http://view:8080
           predicates:
-            - Path=/alerts/** 
-        - id: View
-          uri: http://View:8080
-          predicates:
-            - Path= /mypages/**
-        - id: Point
-          uri: http://Point:8080
-          predicates:
-            - Path=/points/** 
+            - Path= /myPages/**
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -300,12 +356,15 @@ spring:
 server:
   port: 8080
 
+
 ```
 ## CQRS 적용
 TBD
 
 ## 폴리글랏 퍼시스턴스
-TBD
+campsite, payment, view 마이크로서비스는 H2 DB로 구성하였고, booking 마이크로서비스는 HSQL DB로 구성하여 이종 DB사용하면서 정상 동작함을 확인 
+![H2DB](https://user-images.githubusercontent.com/88808412/134929063-9034db8d-dbee-4690-b886-0c6e3a5ea385.png)
+![HSQLDB](https://user-images.githubusercontent.com/88808412/134929017-11882529-9dfe-4ef6-a939-921c268a87f5.png)
 
 ## 동기식 호출과 Fallback 처리
 TBD
