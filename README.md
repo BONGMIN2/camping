@@ -468,9 +468,50 @@ mypage(View)는 Materialized View로 구현하여, 타 마이크로서비스의 
 ![image](https://user-images.githubusercontent.com/88808412/135114772-5caacdee-6808-409d-9f08-6309f836410e.png)
 
 
+# 운영
+
+
+## Deploy/Pipeline
+- yml 파일을 이용한 Docker Image Push/Deploy/서비스생성
+```yaml
+cd booking
+az acr build --registry user2020 --image user2020.azurecr.io/booking:v1 .
+
+cd kubernetes
+kubectl apply -f deployment.yml
+kubectl apply -f service.yaml
+
+cd campsite
+az acr build --registry user2020 --image user2020.azurecr.io/campsite:v1 .
+
+cd kubernetes
+kubectl apply -f deployment.yml
+kubectl apply -f service.yaml
+
+cd gateway
+az acr build --registry user2020 --image user2020.azurecr.io/gateway:v1 .
+
+cd kubernetes
+kubectl apply -f deployment.yml
+kubectl apply -f service.yaml
+
+cd payment
+az acr build --registry user2020 --image user2020.azurecr.io/payment:v1 .
+
+cd kubernetes
+kubectl apply -f deployment.yml
+kubectl apply -f service.yaml
+
+cd view
+az acr build --registry user2020 --image user2020.azurecr.io/view:v1 .
+
+cd kubernetes
+kubectl apply -f deployment.yml
+kubectl apply -f service.yaml
+```
+
+## Config Map
+- 변경 가능성이 있는 항목은 ConfigMap을 사용하여 설정 변경 할수 있도록 구성
+
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
 TBD
-
-# 운영
-TBD
-
