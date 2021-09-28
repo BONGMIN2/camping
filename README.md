@@ -285,7 +285,7 @@ http POST http://localhost:8088/bookings siteId=1 siteNum=100
 
 
 ## Gateway 적용
-GateWay 구성를 통하여 각 서비스들의 진입점을 설정하여 라우팅 설정하였다.(8081~0804)
+Gateay 구성를 통하여 각 서비스들의 진입점을 설정하여 라우팅 설정하였다.(8081~0804)
 ```yaml
 server:
   port: 8088
@@ -448,6 +448,19 @@ campsite 서비스 내 booking 서비스 FeignClient 요청 대상
     }
  }
 ```
+- 동작확인 : 예약 요청 사이트수가 잔여 사이트수보다 많으면 예약 불가함
+![예약불가](https://user-images.githubusercontent.com/88808412/135109246-4e477c3f-143c-4678-b14f-7ca31b7aa469.png)
+
+
+## CQRS 적용
+mypage(View)는 Materialized View로 구현하여, 타 마이크로서비스의 데이터 원본에 Join SQL 등 구현 없이도 내 서비스의 화면 구성과 잦은 조회가 가능하게 구현 하였음.
+
+- 캠프사이트 예약 Transaction 발생 후 myPage 조회 결과
+![예약뷰](https://user-images.githubusercontent.com/88808412/135107602-c21e8cc7-b8dc-456b-bb02-229c9a676cce.png)
+- 캠프사이트 예약취소 후 myPage 조회 결과
+![예약취소뷰](https://user-images.githubusercontent.com/88808412/135108070-46140080-d81f-47be-bf7e-6e0963f7e4a0.png)
+
+## SAGA 패턴
 
 
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
