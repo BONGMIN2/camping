@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: campsite
+  labels:
+    app: campsite
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: campsite
