@@ -119,7 +119,7 @@ mvn spring-boot:run
 msaez Event-Storming을 통해 구현한 Aggregate 단위로 Entity 를 정의 하였으며,
 Entity Pattern 과 Repository Pattern을 적용하기 위해 Spring Data REST 의 RestRepository 를 적용하였다.
 
-Bookrental 서비스의 rental.java
+Campsite 서비스의 campsite.java
 
 ```java
 
@@ -285,7 +285,7 @@ http POST http://localhost:8088/bookings siteId=1 siteNum=100
 
 
 ## Gateway 적용
-GateWay 구성를 통하여 각 서비스들의 진입점을 설정하여 라우팅 설정하였다.
+GateWay 구성를 통하여 각 서비스들의 진입점을 설정하여 라우팅 설정하였다.(8081~0804)
 ```yaml
 server:
   port: 8088
