@@ -285,7 +285,7 @@ http POST http://localhost:8088/bookings siteId=1 siteNum=100
 
 
 ## Gateway 적용
-Gateay 구성를 통하여 각 서비스들의 진입점을 설정하여 라우팅 설정하였다.(8081~0804)
+Gateay 구성를 통하여 각 서비스들의 진입점을 설정하여 라우팅 설정하였다.(8081~8084, 8088)
 ```yaml
 server:
   port: 8088
@@ -509,9 +509,6 @@ cd kubernetes
 kubectl apply -f deployment.yml
 kubectl apply -f service.yaml
 ```
-
-## Config Map
-- 변경 가능성이 있는 항목은 ConfigMap을 사용하여 설정 변경 할수 있도록 구성
 
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
 TBD
