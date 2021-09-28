@@ -374,8 +374,7 @@ campsite, payment, view 마이크로서비스는 H2 DB로 구성하였고, booki
 ![HSQLDB](https://user-images.githubusercontent.com/88808412/134929017-11882529-9dfe-4ef6-a939-921c268a87f5.png)
 
 ## 동기식 호출과 Fallback 처리
-예약 진행시 예약수량보다 캠프사이트 잔여개수가 적으면 예약을 받지 말아야 하므로 동기호출이 필요하다고 판단하여
-Rest Repository에 의해 노출되어 있는 REST 서비스를 FeignClient를 이용하여 호출하도록 구현 하였음
+예약수량보다 캠프사이트 잔여개수가 적으면 예약을 받지 않도록 FeignClient를 이용한 Req/Rsep 동기호출 하였음
 
 Booking 서비스 내 CampsiteService.Java
 ```java
@@ -461,6 +460,12 @@ mypage(View)는 Materialized View로 구현하여, 타 마이크로서비스의 
 ![예약취소뷰](https://user-images.githubusercontent.com/88808412/135108070-46140080-d81f-47be-bf7e-6e0963f7e4a0.png)
 
 ## SAGA 패턴
+캠핑장 예약시스템은 마이크로서비스에서 이벤트가 Publish 되면 후속 서비스가 Trigger 되는 SAGA 패턴으로 디자인 되었다.
+- Booking이 생성 완료되면 Payment 서비스를 trigger하여 Payment 상태를 업데이트한다.
+- Booking
+![image](https://user-images.githubusercontent.com/88808412/135114693-da901a3c-bdfd-456c-b959-1700864dbc28.png)
+- Payment
+![image](https://user-images.githubusercontent.com/88808412/135114772-5caacdee-6808-409d-9f08-6309f836410e.png)
 
 
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
