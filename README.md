@@ -1,4 +1,4 @@
-# Cloud Lv2 개인 [팀 과제(도서대여시스템(3팀))와 별개로 구현]
+# Cloud Lv2 개인 [팀 과제"도서대여시스템(3팀)"와 별개로 심플 시스템 구현]
 ![image](https://user-images.githubusercontent.com/88808412/134763175-59df144a-e12a-41d3-b031-bfd04ad79881.png)
    
 
