@@ -1,4 +1,4 @@
-# Cloud Lv2 개인 [캠핑장 예약 시스템]
+# Cloud Lv2 개인 [팀 과제(도서대여시스템(3팀))와 별개로 구현]
 ![image](https://user-images.githubusercontent.com/88808412/134763175-59df144a-e12a-41d3-b031-bfd04ad79881.png)
    
 
@@ -87,12 +87,6 @@
 ### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
 ![검증1](https://user-images.githubusercontent.com/88808412/134923667-e163aa33-fde1-4e79-bf55-f1713c32d7ae.png)
 ![검증2](https://user-images.githubusercontent.com/88808412/134923738-3afc0388-3e44-48b9-ae71-3e123937c348.png)
-
-
-## 헥사고날 아키텍처 다이어그램 도출
-    
-TBD
-
 
 
 # 구현
@@ -364,9 +358,6 @@ server:
 
 
 ```
-## CQRS 적용
-myPage(View)는 Materialized View로 구현하여, 타 마이크로서비스의 데이터 원본에 Join SQL 등 구현 없이도 내 서비스의 화면 구성과 잦은 조회가 가능하게 구현 하였음.
-![myPage](https://user-images.githubusercontent.com/88808412/134931933-58453fe1-10fe-4236-8564-d5edb8d81c42.png)
 
 ## 폴리글랏 퍼시스턴스
 campsite, payment, view 마이크로서비스는 H2 DB로 구성하였고, booking 마이크로서비스는 HSQL DB로 구성하여 이종 DB사용하면서 정상 동작함을 확인 
@@ -509,6 +500,11 @@ cd kubernetes
 kubectl apply -f deployment.yml
 kubectl apply -f service.yaml
 ```
+## Config Map
+- 변경 가능성이 있는 항목은 ConfigMap을 사용하여 설정 변경 할 수 있도록 구성
+-- booking 서비스에서 바라보는 campsite 서비스 url을 ConfigMap 사용하여 구현 함
+![image](https://user-images.githubusercontent.com/88808412/135198241-def7cd7d-11bf-4d79-a75c-3bc3495b315b.png)
+![image](https://user-images.githubusercontent.com/88808412/135198314-f92e148f-856a-456d-aae9-c095baaf73f8.png)
 
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
 TBD
