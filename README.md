@@ -367,7 +367,7 @@ campsite, payment, view 마이크로서비스는 H2 DB로 구성하였고, booki
 ## 동기식 호출과 Fallback 처리
 예약수량보다 캠프사이트 잔여개수가 적으면 예약을 받지 않도록 FeignClient를 이용한 Req/Rsep 동기호출 하였음
 
-Booking 서비스 내 CampsiteService.Java
+Booking 서비스 내 CampsiteService.Java 에 FeignClient 적용
 ```java
 package camping.external;
 
