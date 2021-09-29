@@ -259,19 +259,19 @@ public interface CampsiteRepository extends PagingAndSortingRepository<Campsite,
 각 서비스들의 Rest API 호출을 통하여 테스트를 수행하였음
 
 ```shell
-캠핑사이트 1번 50개 등록
+캠핑사이트 10번 50개 등록
 http POST http://localhost:8088/campsites siteId=1 siteType=square bookableSite=50     
 ```
 ![캠프사이트등록](https://user-images.githubusercontent.com/88808412/134927991-668cabaf-4c95-44c4-bd93-7d16b6fbc170.png)
 
 ```shell
-캠핑사이트 1번 1개 예약
+캠핑사이트 10번 1개 예약
 http POST http://localhost:8088/bookings siteId=1 siteNum=1
 ```
 ![예약](https://user-images.githubusercontent.com/88808412/134928092-2bb9b8f8-5f38-4b35-8842-e95d4c27974c.png)
 
 ```shell
-캠핑사이트 1번 100개 예약 실패(사이트 잔여수량 부족)  
+캠핑사이트 10번 100개 예약 실패(사이트 잔여수량 부족)  
 http POST http://localhost:8088/bookings siteId=1 siteNum=100    
 ```
 ![초과예약](https://user-images.githubusercontent.com/88808412/134928203-a6d3940c-d72e-4414-8781-77c28c35f3e6.png)
