@@ -506,5 +506,8 @@ kubectl apply -f service.yaml
 ![image](https://user-images.githubusercontent.com/88808412/135198241-def7cd7d-11bf-4d79-a75c-3bc3495b315b.png)
 ![image](https://user-images.githubusercontent.com/88808412/135198314-f92e148f-856a-456d-aae9-c095baaf73f8.png)
 
-## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
-TBD
+## Self-healing(Liveness Probe)
+- Liveness Probe  설정 및 restart 시도 점검을 위해 잘못된 포트번호로 설정 변경 후 restart 점검 결과
+![image](https://user-images.githubusercontent.com/88808412/135200760-df9d4fbc-d8ce-490f-bddb-5f16a6b91ccd.png)
+
+
