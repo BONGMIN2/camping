@@ -9,16 +9,16 @@
   - [체크포인트](#체크포인트)
   - [분석/설계](#분석설계)
   - [구현:](#구현)
-    - [DDD 의 적용](#ddd-의-적용)
-    - [Gateway 적용](# Gateway 적용)
-    - [폴리글랏 퍼시스턴스](# 폴리글랏 퍼시스턴스)
-    - [동기식 호출과 Fallback 처리](# 동기식 호출과 Fallback 처리)
-    - [CQRS 적용](# CQRS 적용)
-    - [SAGA 패턴 적용](# SAGA 패턴)
+    - [DDD 의 적용]
+    - [Gateway 적용]
+    - [폴리글랏 퍼시스턴스](
+    - [동기식 호출과 Fallback 처리]
+    - [CQRS 적용]
+    - [SAGA 패턴 적용]
   - [운영](#운영)
-    - [Deploy](# Deploy/Pipeline)
-    - [Config Map](# Config Map)
-    - [Self-healing(Liveness Probe)](# Self-healing(Liveness Probe))
+    - [Deploy]
+    - [Config Map]
+    - [Self-healing(Liveness Probe)]
 
 
 # 서비스 시나리오
